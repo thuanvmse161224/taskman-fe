@@ -1,40 +1,65 @@
-// utils/taskUtils.ts
+import { Task } from "src/common";
 
 /**
- * Formats a dueDate into a readable string or returns 'No due date'
- * @param dueDate - Optional date object
+ * Formats a dueDate from a Task into a readable string or returns 'No due date'
+ * @param task - Task object containing an optional dueDate
  * @returns Formatted dueDate string or 'No due date'
  */
-export function getDueDateString(dueDate?: Date): string {
+export function getDueDateString(task: Task): string {
+    const { dueDate } = task;
+
     if (!dueDate) {
         return 'No due date';
     }
 
-    const day = dueDate.getDate();
-    const month = dueDate.getMonth() + 1; // Months are zero-indexed
-    const year = dueDate.getFullYear();
-    return `${month}/${day}/${year}`;
+    const date = new Date(dueDate);
+    const day = date.getDate();
+    const month = date.getMonth() + 1; // Months are zero-indexed
+    const year = date.getFullYear();
+    
+    return `${day}/${month}/${year}`;
 }
 
 /**
- * Returns a status message for the dueDate indicating whether it's today, tomorrow, overdue, or a specific date
- * @param dueDate - Optional date object
+ * Returns a status message for the dueDate from a Task indicating whether it's today, tomorrow, overdue, or a specific date
+ * @param task - Task object containing an optional dueDate
  * @returns Status message for the dueDate
  */
-export function getDueDateStatus(dueDate?: Date): string {
+export function getDueDateStatus(task: Task): string {
+    const { dueDate } = task;
+
     if (!dueDate) {
         return 'No due date';
     }
 
+    // Convert dueDate string to Date object
+    const dueDateFormatted = new Date(dueDate);
+
+    // Check for valid Date object
+    if (isNaN(dueDateFormatted.getTime())) {
+        return 'Invalid due date';
+    }
+
     const now = new Date();
-    if (dueDate.toDateString() === now.toDateString()) {
+    const today = now.toDateString();
+
+    if (dueDateFormatted.toDateString() === today) {
         return 'Due today';
     }
-    if (dueDate.toDateString() === new Date(now.setDate(now.getDate() + 1)).toDateString()) {
+
+    // Check for tomorrow's date
+    const tomorrow = new Date(now);
+    tomorrow.setDate(now.getDate() + 1);
+
+    if (dueDateFormatted.toDateString() === tomorrow.toDateString()) {
         return 'Due tomorrow';
     }
-    if (dueDate < now) {
-        return `Overdue since ${dueDate.toLocaleDateString()}`;
+
+    // Check for overdue status
+    if (dueDateFormatted < now) {
+        return `Overdue since ${dueDateFormatted.toLocaleDateString()}`;
     }
-    return `Due on ${dueDate.toLocaleDateString()}`;
+
+    // Default due date message
+    return `Due on ${dueDateFormatted.toLocaleDateString()}`;
 }

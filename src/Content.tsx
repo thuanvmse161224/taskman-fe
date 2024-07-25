@@ -1,17 +1,24 @@
-import { useState } from 'react';
-import { Task, TaskStatus } from './common'; // Adjust the path based on your project structure
+import { useState, useEffect } from 'react';
+import axios from 'axios';
+import { Task } from './common';
 import TaskList from './components/TaskList';
-
-const sampleTask: Task[] = [{
-    title: 'Complete React Project',
-    description: 'Build a sample project using React with TypeScript.',
-    status: TaskStatus.TODO,
-    dueDate: new Date(), // Optional dueDate field
-}];
+import config from '@config';
 
 function Content() {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const [tasks, setTasks] = useState<Task[]>(sampleTask);
+    const [tasks, setTasks] = useState<Task[]>([]);
+
+    useEffect(() => {
+        const fetchTasks = async () => {
+            try {
+                const response = await axios.get(`${config.backendUrl}/tasks`);
+                setTasks(response.data);
+            } catch (error) {
+                console.error('Error fetching tasks:', error);
+            }
+        };
+
+        fetchTasks();
+    }, []);
 
     return (
         <main className=''>

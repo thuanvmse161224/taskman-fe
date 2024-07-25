@@ -7,8 +7,9 @@ export enum TaskStatus {
 
 // Define a TypeScript interface for Task
 export interface Task {
+    id: string; // MongoDB document ID
     title: string;
     description: string;
     status: TaskStatus; // Use the TaskStatus enum for status
-    dueDate?: Date; // Optional dueDate field
+    dueDate?: string; // Optional dueDate field
 }
